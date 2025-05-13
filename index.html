@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirect to Event Reservation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f0f0f0;
+    }
+    .message {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    .button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="message">Opening your event reservation...</div>
+  <a id="open-browser" href="#" class="button">Open in Browser</a>
+
+  <script>
+    // Your Google Apps Script web app URL
+    const targetUrl = 'https://script.google.com/macros/s/AKfycbzwckTqnmqdbDSgavqKH8FszDB1-QuY7baONWmSg9AIirIoFB4hIGjLS2tJwZ-oMwBUkg/exec'; // Replace with your web app URL
+
+    // Detect device and browser
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isAndroid = /android/i.test(userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isInstagram = /Instagram/.test(userAgent);
+    const isFacebook = /FBAN|FBAV/.test(userAgent);
+
+    // Check if likely in an in-app browser
+    const isInAppBrowser = isInstagram || isFacebook || (window.innerHeight < window.outerHeight * 0.9);
+
+    if (isInAppBrowser) {
+      let redirectUrl = targetUrl;
+
+      if (isAndroid) {
+        // Attempt to open in Chrome using an intent URL
+        redirectUrl = `intent://${targetUrl.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end`;
+      } else if (isIOS) {
+        // For iOS, try to open in Safari (universal link or direct redirect)
+        redirectUrl = targetUrl; // iOS may allow direct redirect, or prompt user
+      }
+
+      // Update the link
+      const openBrowserLink = document.getElementById('open-browser');
+      openBrowserLink.href = redirectUrl;
+      openBrowserLink.textContent = isAndroid ? 'Open in Chrome' : 'Open in Safari';
+
+      // Auto-redirect after a short delay
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1000);
+    } else {
+      // If not in an in-app browser, redirect immediately
+      window.location.href = targetUrl;
+    }
+  </script>
+</body>
+</html>
