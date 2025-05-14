@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Reservation Redirect</title>
+  <title>Event Reservation</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -27,17 +27,9 @@
       border-radius: 6px;
       font-size: 1.2em;
       font-weight: bold;
-      transition: background-color 0.3s;
     }
     .button:hover {
       background-color: #0056b3;
-    }
-    .error {
-      color: #d32f2f;
-      font-size: 1em;
-      margin-top: 20px;
-      display: none;
-      line-height: 1.5;
     }
     .fallback {
       font-size: 0.9em;
@@ -48,93 +40,8 @@
   </style>
 </head>
 <body>
-  <div class="message" id="message">Please tap below to open the event reservation.</div>
-  <a id="open-browser" href="https://script.google.com/macros/s/your-web-app-id/exec" class="button" target="_blank" rel="noopener noreferrer" onclick="console.log('[Redirect] Button clicked, href: ' + this.href);">Open Reservation</a>
-  <div class="fallback" id="fallback">If the browser doesn't open, copy this URL and paste it in your browser: <br><span id="fallback-url"></span></div>
-  <div class="error" id="error-message"></div>
-
-  <script>
-    // Run after DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      // Configuration
-      const targetUrl = 'https://script.google.com/macros/s/your-web-app-id/exec'; // Replace with your web app URL
-
-      // Debug logging
-      function log(message) {
-        console.log(`[Redirect] ${message}`);
-      }
-
-      // Display error
-      function showError(message) {
-        const errorDiv = document.getElementById('error-message');
-        if (errorDiv) {
-          errorDiv.textContent = message;
-          errorDiv.style.display = 'block';
-        }
-        log(`Error: ${message}`);
-      }
-
-      try {
-        // Get DOM elements
-        const openBrowserLink = document.getElementById('open-browser');
-        const messageDiv = document.getElementById('message');
-        const fallbackUrlSpan = document.getElementById('fallback-url');
-
-        if (!openBrowserLink || !messageDiv || !fallbackUrlSpan) {
-          showError('Page elements not found. Please refresh the page.');
-          return;
-        }
-
-        // Set fallback URL
-        fallbackUrlSpan.textContent = targetUrl;
-        log(`Set fallback URL: ${targetUrl}`);
-
-        // Detect device and browser
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera || '';
-        const isAndroid = /android/i.test(userAgent);
-        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-        const isInstagram = /Instagram/.test(userAgent);
-        const isFacebook = /FBAN|FBAV/.test(userAgent);
-        const isWebView = window.innerHeight < window.outerHeight * 0.9 || !window.matchMedia('(display-mode: browser)').matches;
-
-        const isInAppBrowser = isInstagram || isFacebook || isWebView;
-
-        log(`User Agent: ${userAgent}`);
-        log(`isAndroid: ${isAndroid}, isIOS: ${isIOS}, isInAppBrowser: ${isInAppBrowser}`);
-
-        // Configure link based on device
-        if (isInAppBrowser) {
-          if (isAndroid) {
-            // Android: Use intent for Chrome
-            openBrowserLink.href = `intent://${targetUrl.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end`;
-            openBrowserLink.textContent = 'Open in Chrome';
-            openBrowserLink.removeAttribute('onclick'); // Remove onclick for Android
-            messageDiv.textContent = 'Tap to open the event reservation in Chrome. If it opens in Instagram, copy the URL below and paste it in Chrome or long-press the button and select "Open in Chrome".';
-            log('Android detected, set Chrome intent');
-          } else if (isIOS) {
-            // iOS: Direct link with Safari prompt
-            openBrowserLink.href = targetUrl;
-            openBrowserLink.textContent = 'Open in Safari';
-            messageDiv.textContent = 'Tap to open the event reservation in Safari. If it opens in Instagram, long-press the button and select "Open in Safari" or copy the URL below and paste it in Safari.';
-            log('iOS detected, set Safari link');
-          } else {
-            openBrowserLink.href = targetUrl;
-            openBrowserLink.textContent = 'Open in Browser';
-            messageDiv.textContent = 'Tap to open the event reservation in your browser. If it opens in Instagram, copy the URL below and paste it in your browser.';
-            log('Other device detected, set default link');
-          }
-        } else {
-          openBrowserLink.href = targetUrl;
-          openBrowserLink.textContent = 'Open Reservation';
-          messageDiv.textContent = 'Tap to open the event reservation.';
-          log('Not in in-app browser, set direct link');
-        }
-
-      } catch (err) {
-        showError('An error occurred. Please copy the URL below and open it in your browser.');
-        log(`General error: ${err.message}`);
-      }
-    });
-  </script>
+  <div class="message">Please tap below to open the event reservation. If it opens in Instagram, long-press the button and select "Open in Safari" (iPhone) or "Open in Chrome" (Android), or copy the URL below and paste it in your browser.</div>
+  <a class="button" href="https://script.google.com/macros/s/your-web-app-id/exec" target="_blank" rel="noopener noreferrer">Open Reservation</a>
+  <div class="fallback">Fallback URL: <br>https://script.google.com/macros/s/your-web-app-id/exec</div>
 </body>
 </html>
