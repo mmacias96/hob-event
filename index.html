@@ -43,12 +43,13 @@
       font-size: 0.9em;
       margin-top: 15px;
       color: #555;
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
   <div class="message" id="message">Please tap below to open the event reservation.</div>
-  <a id="open-browser" href="https://script.google.com/macros/s/your-web-app-id/exec" class="button" target="_blank" rel="noopener noreferrer">Open Reservation</a>
+  <a id="open-browser" href="https://script.google.com/macros/s/your-web-app-id/exec" class="button" target="_blank" rel="noopener noreferrer" onclick="console.log('[Redirect] Button clicked, href: ' + this.href);">Open Reservation</a>
   <div class="fallback" id="fallback">If the browser doesn't open, copy this URL and paste it in your browser: <br><span id="fallback-url"></span></div>
   <div class="error" id="error-message"></div>
 
@@ -56,7 +57,7 @@
     // Run after DOM is fully loaded
     document.addEventListener('DOMContentLoaded', () => {
       // Configuration
-      const targetUrl = 'https://script.google.com/a/*/macros/s/AKfycbzwckTqnmqdbDSgavqKH8FszDB1-QuY7baONWmSg9AIirIoFB4hIGjLS2tJwZ-oMwBUkg/exec'; // Replace with your web app URL
+      const targetUrl = 'https://script.google.com/macros/s/your-web-app-id/exec'; // Replace with your web app URL
 
       // Debug logging
       function log(message) {
@@ -104,23 +105,22 @@
         // Configure link based on device
         if (isInAppBrowser) {
           if (isAndroid) {
-            // Android: Try intent for Chrome, fallback to direct link
+            // Android: Use intent for Chrome
             openBrowserLink.href = `intent://${targetUrl.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end`;
             openBrowserLink.textContent = 'Open in Chrome';
-            messageDiv.textContent = 'Tap to open the event reservation in Chrome. If it opens in Instagram, copy the URL below and paste it in Chrome.';
-            // Fallback to direct link if intent fails
-            openBrowserLink.setAttribute('data-fallback-href', targetUrl);
-            log('Android detected, set Chrome intent with fallback');
+            openBrowserLink.removeAttribute('onclick'); // Remove onclick for Android
+            messageDiv.textContent = 'Tap to open the event reservation in Chrome. If it opens in Instagram, copy the URL below and paste it in Chrome or long-press the button and select "Open in Chrome".';
+            log('Android detected, set Chrome intent');
           } else if (isIOS) {
             // iOS: Direct link with Safari prompt
             openBrowserLink.href = targetUrl;
             openBrowserLink.textContent = 'Open in Safari';
-            messageDiv.textContent = 'Tap to open the event reservation in Safari. If it opens in Instagram, copy the URL below and paste it in Safari.';
+            messageDiv.textContent = 'Tap to open the event reservation in Safari. If it opens in Instagram, long-press the button and select "Open in Safari" or copy the URL below and paste it in Safari.';
             log('iOS detected, set Safari link');
           } else {
             openBrowserLink.href = targetUrl;
             openBrowserLink.textContent = 'Open in Browser';
-            messageDiv.textContent = 'Tap to open the event reservation in your browser.';
+            messageDiv.textContent = 'Tap to open the event reservation in your browser. If it opens in Instagram, copy the URL below and paste it in your browser.';
             log('Other device detected, set default link');
           }
         } else {
@@ -129,21 +129,6 @@
           messageDiv.textContent = 'Tap to open the event reservation.';
           log('Not in in-app browser, set direct link');
         }
-
-        // Handle click with Android fallback
-        openBrowserLink.addEventListener('click', (e) => {
-          log(`Button clicked, navigating to: ${openBrowserLink.href}`);
-          if (isAndroid && openBrowserLink.href.startsWith('intent://')) {
-            // Try intent, fallback to direct link after a short delay
-            setTimeout(() => {
-              if (document.visibilityState === 'visible') {
-                log('Intent likely failed, trying fallback URL');
-                openBrowserLink.href = openBrowserLink.getAttribute('data-fallback-href');
-                openBrowserLink.click();
-              }
-            }, 1000);
-          }
-        });
 
       } catch (err) {
         showError('An error occurred. Please copy the URL below and open it in your browser.');
