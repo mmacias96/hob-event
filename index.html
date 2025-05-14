@@ -3,145 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirect to Event Reservation</title>
+  <title>Event Reservation</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
-      background-color: #f0f0f0;
+      padding: 40px;
+      background-color: #f4f4f4;
       margin: 0;
+      color: #333;
     }
     .message {
-      font-size: 1.2em;
-      margin-bottom: 20px;
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      line-height: 1.5;
     }
     .button {
       display: inline-block;
-      padding: 12px 24px;
+      padding: 14px 28px;
       background-color: #007BFF;
       color: white;
       text-decoration: none;
-      border-radius: 5px;
-      font-size: 1.1em;
-      transition: background-color 0.3s;
+      border-radius: 6px;
+      font-size: 1.2em;
+      font-weight: bold;
     }
     .button:hover {
       background-color: #0056b3;
     }
-    .error {
-      color: red;
-      font-size: 0.9em;
-      margin-top: 20px;
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <div class="message" id="message">Opening your event reservation...</div>
-  <a id="open-browser" href="#" class="button">Open in Browser</a>
-  <div class="error" id="error-message"></div>
-
-  <script>
-    // Ensure script runs after DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      // Your Google Apps Script web app URL
-      const targetUrl = 'https://script.google.com/a/*/macros/s/AKfycbzwckTqnmqdbDSgavqKH8FszDB1-QuY7baONWmSg9AIirIoFB4hIGjLS2tJwZ-oMwBUkg/exec'; // Replace with your web app URL
-
-      // Debug logging
-      function log(message) {
-        console.log(`[Redirect] ${message}`);
-      }
-
-      // Display error to user
-      function showError(message) {
-        const errorDiv = document.getElementById('error-message');
-        if (errorDiv) {
-          errorDiv.textContent = message;
-          errorDiv.style.display = 'block';
-        }
-        log(`Error: ${message}`);
-      }
-
-      try {
-        // Detect device and browser
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera || '';
-        const isAndroid = /android/i.test(userAgent);
-        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-        const isInstagram = /Instagram/.test(userAgent);
-        const isFacebook = /FBAN|FBAV/.test(userAgent);
-        const isWebView = window.innerHeight < window.outerHeight * 0.9 || !window.matchMedia('(display-mode: browser)').matches;
-
-        // Check if likely in an in-app browser
-        const isInAppBrowser = isInstagram || isFacebook || isWebView;
-
-        log(`User Agent: ${userAgent}`);
-        log(`isAndroid: ${isAndroid}, isIOS: ${isIOS}, isInAppBrowser: ${isInAppBrowser}`);
-
-        // Get the open-browser link element
-        const openBrowserLink = document.getElementById('open-browser');
-        const messageDiv = document.getElementById('message');
-
-        if (!openBrowserLink || !messageDiv) {
-          showError('Page elements not found. Please refresh and try again.');
-          return;
-        }
-
-        if (isInAppBrowser) {
-          let redirectUrl = targetUrl;
-          let buttonText = 'Open in Browser';
-
-          if (isAndroid) {
-            // Android: Use intent to open Chrome
-            redirectUrl = `intent://${targetUrl.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end`;
-            buttonText = 'Open in Chrome';
-            messageDiv.textContent = 'Redirecting to Chrome...';
-            log('Android detected, using Chrome intent');
-          } else if (isIOS) {
-            // iOS: Direct redirect with manual fallback
-            redirectUrl = targetUrl;
-            buttonText = 'Open in Safari';
-            messageDiv.textContent = 'Tap below to open in Safari if not redirected...';
-            log('iOS detected, attempting Safari redirect');
-          }
-
-          // Update the link
-          openBrowserLink.href = redirectUrl;
-          openBrowserLink.textContent = buttonText;
-
-          // Attempt auto-redirect after a short delay
-          setTimeout(() => {
-            try {
-              log(`Attempting redirect to: ${redirectUrl}`);
-              window.location.href = redirectUrl;
-
-              // Fallback for iOS: Prompt user if redirect fails
-              if (isIOS) {
-                setTimeout(() => {
-                  if (document.visibilityState === 'visible') {
-                    showError('Redirect failed. Please tap "Open in Safari" to continue.');
-                    messageDiv.textContent = 'Please open in Safari to access the event reservation.';
-                  }
-                }, 2000);
-              }
-            } catch (err) {
-              showError('Error during redirect. Please tap the button to continue.');
-              log(`Redirect error: ${err.message}`);
-            }
-          }, 1000);
-        } else {
-          // Not in an in-app browser, redirect immediately
-          log(`Not in in-app browser, redirecting to: ${targetUrl}`);
-          messageDiv.textContent = 'Redirecting to event reservation...';
-          openBrowserLink.href = targetUrl;
-          openBrowserLink.textContent = 'Open Reservation';
-          window.location.href = targetUrl;
-        }
-      } catch (err) {
-        showError('An error occurred. Please tap the button or refresh the page.');
-        log(`General error: ${err.message}`);
-      }
-    });
-  </script>
+  <div class="message">Please tap below to open the event reservation in your browser.</div>
+  <a class="button" href="https://script.google.com/a/*/macros/s/AKfycbzwckTqnmqdbDSgavqKH8FszDB1-QuY7baONWmSg9AIirIoFB4hIGjLS2tJwZ-oMwBUkg/exec" target="_blank">Open Reservation</a>
 </body>
 </html>
